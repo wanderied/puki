@@ -1,0 +1,91 @@
+name: Build
+on:
+  pull_request:
+        branches:
+          - master
+
+jobs:
+  check_and_build:
+    name: Checkout
+    runs-on: ubuntu-latest
+
+
+    steps:
+      - name: Setup go
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.15.6'
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '15'
+
+
+      - id: go-cache-paths
+        run: |
+          echo "::set-output name=go-build::$(go env GOCACHE)"
+          echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-modules-${{  hashFiles('**/yarn.lock') }}-
+            ${{ runner.os }}-modules-
+            ${{ runner.os }}-
+
+      - name: Go Build Cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.go-cache-paths.outputs.go-build }}
+          key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
+
+
+      - name: Go Mod Cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.go-cache-paths.outputs.go-mod }}
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+
+      - name: Golang code style check
+        run: diff -u <(echo -n) <(gofmt -d ./) > /tmp/gofmtdiff 2>&1
+
+      - name: Golang code style post message
+        if: ${{ failure() }}
+        run: |
+          curl \
+          -X POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          -d '{"body":'"$(printf "**❌ Code style checking failed**\nPlease format your code via \`go fmt ./...\`.\n\`\`\`diff\n$(cat /tmp/gofmtdiff)\`\`\`" | jq  -aRs .)"'}' \
+          && exit 1
+
+      - run: cd app && yarn
+      - name: Fontend code style check
+        run: cd app && yarn prettier:check > /tmp/prettierout 2>&1
+
+      - name: Prettier code style post message
+        if: ${{ failure() }}
+        run: |
+          curl \
+          -X POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+          --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          -d '{"body":'"$(printf "**❌ Code style checking failed**\nPlease format your code via \`yarn prettier\`.\n\`\`\`sh\n$(cat /tmp/prettierout)\`\`\`" | jq  -aRs .)"'}' \
+          && exit 1
+      - run: go mod download
+
+      - name: Build frontend
+        run: cd app && yarn build && mv dist ..
+
+      - name: Build backend
+        run:  go build -o dist/server  github.com/lantu-dev/puki/cmd/main
