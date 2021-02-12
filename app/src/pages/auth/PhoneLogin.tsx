@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { call } from '@/api-client/index';
+import { Button, Divider } from 'antd';
+import { useState } from 'react';
 import { history } from 'umi';
 import Captcha from './components/Captcha';
 import Phone from './components/Phone';
 import Register from './components/Register';
-
-const DEBUG = true;
 
 interface UserInfo {
   Nickname: string;
@@ -15,68 +15,170 @@ interface UserInfo {
   Name: string;
 }
 
+interface SMSSendCodeReq {
+  PhoneNumber: string;
+}
+interface SMSSendCodeRes {
+  err: { message: string; status: number };
+  result: { Session: string };
+}
+interface SMSCodeLoginReq {
+  PhoneNumber: string;
+  Code: string;
+  Session: string;
+}
+interface SMSCodeLoginRes {
+  err: { message: string; status: number };
+  result: { TokenUser: TokenUser; Token: string };
+}
+interface TokenUser {
+  ID: number;
+  // Token 失效时间
+  ExpiresAt: number;
+  // 用户角色
+  // Roles     []int64
+  IsStaff: boolean;
+  IsSuper: boolean;
+}
+
 enum STEP {
   phoneNumberInput,
-  captchaInput,
+  CaptchaInput,
   registerInput,
 }
 
 export default function PhoneLogin() {
   const [step, setStep] = useState(STEP.phoneNumberInput);
   const [PhoneNumber, setPhoneNumber] = useState('');
+  const [Session, setSession] = useState('');
+  const [tick, setTick] = useState(0);
 
-  async function phoneNumberConfirmed(PhoneNumber: string) {
-    DEBUG && console.log(PhoneNumber);
+  const goTick = () => {
+    let cnt = 60;
+    let timer = setInterval(() => {
+      setTick(cnt--);
+      if (cnt < 0) {
+        clearInterval(timer);
+      }
+    }, 1000);
+  };
 
-    setPhoneNumber(PhoneNumber);
-    setStep(STEP.captchaInput);
-  }
+  const sendCaptcha = async () => {
+    console.group('sendCaptcha');
 
-  async function captchaConfirmed(captcha: string) {
-    DEBUG && console.log(captcha);
-
-    // TODO 确认验证码, 验证手机号是否注册
-    let valid = true;
-    let registered = false;
-
-    if (valid && registered) {
-      history.replace('./topic');
-    } else if (valid) {
-      setStep(STEP.registerInput);
-    } else {
-      // TODO 验证码错误, 出现弹窗
+    try {
+      let res = await call<SMSSendCodeReq, SMSSendCodeRes>(
+        'auth/UserService.SMSSendCode',
+        {
+          PhoneNumber,
+        },
+      );
+      console.log('res: ', res);
+      setSession(res.result.Session);
+    } catch (err) {
+      console.log('err: ', err);
     }
-  }
 
-  async function registerConfirmed(values: UserInfo) {
-    DEBUG && console.log(values);
-    history.replace('./topic');
-  }
+    console.groupEnd();
+  };
+
+  const reCaptcha = () => {
+    if (tick > 0) {
+      return;
+    }
+    goTick();
+    sendCaptcha();
+  };
+
+  const phoneNumberConfirmed = (PhoneNumber: string) => {
+    console.group('phoneNumberConfirmed');
+
+    console.log('PhoneNumber: ', PhoneNumber);
+    setPhoneNumber(PhoneNumber);
+    setStep(STEP.CaptchaInput);
+
+    reCaptcha();
+
+    console.groupEnd();
+  };
+
+  const CaptchaConfirmed = async (Captcha: string) => {
+    console.group('CaptchaConfirmed');
+
+    console.log('Captcha: ', Captcha);
+
+    try {
+      let res = await call<SMSCodeLoginReq, SMSCodeLoginRes>(
+        'auth/UserService.SMSCodeLogin',
+        {
+          PhoneNumber,
+          Code: Captcha,
+          Session,
+        },
+      );
+
+      // TODO 等后端重构
+
+      const { Token, TokenUser } = res.result;
+
+      if (!TokenUser.ID) {
+        setStep(STEP.registerInput);
+      } else {
+        history.replace('./topic');
+      }
+    } catch (err) {
+      console.log('err: ', err);
+    }
+
+    console.groupEnd();
+  };
+
+  const registerConfirmed = async (values: UserInfo) => {
+    console.group('registerConfirmed');
+
+    // TODO 注册
+
+    console.groupEnd();
+  };
 
   return (
     <>
-      {(() => {
-        switch (step) {
-          case STEP.phoneNumberInput:
-            return <Phone onConfirm={phoneNumberConfirmed}></Phone>;
-          case STEP.captchaInput:
-            return (
-              <Captcha
-                onConfirm={captchaConfirmed}
-                goback={() => {
-                  setStep(STEP.phoneNumberInput);
-                }}
-              ></Captcha>
-            );
-          case STEP.registerInput:
-            return (
-              <Register
-                onConfirm={registerConfirmed}
-                PhoneNumber={PhoneNumber}
-              ></Register>
-            );
-        }
-      })()}
+      {
+        [
+          <Phone onConfirm={phoneNumberConfirmed}></Phone>,
+          <Captcha
+            onConfirm={CaptchaConfirmed}
+            goback={() => {
+              setStep(STEP.phoneNumberInput);
+            }}
+            reCaptcha={reCaptcha}
+            tick={tick}
+          ></Captcha>,
+          <Register
+            onConfirm={registerConfirmed}
+            PhoneNumber={PhoneNumber}
+          ></Register>,
+        ][step]
+      }
+
+      {/* 调试 */}
+      <>
+        <Divider></Divider>
+        <Button
+          onClick={() => {
+            setStep(step > 0 ? step - 1 : step);
+          }}
+        >
+          上一页
+        </Button>
+        <Button
+          onClick={() => {
+            setStep(step < 2 ? step + 1 : step);
+          }}
+        >
+          下一页
+        </Button>
+      </>
     </>
   );
 }

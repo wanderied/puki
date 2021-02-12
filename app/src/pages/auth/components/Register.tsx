@@ -11,8 +11,6 @@ import {
 import React, { useState } from 'react';
 const { Title } = Typography;
 
-const DEBUG = true;
-
 interface RegisterProps {
   onConfirm: (values: any) => void;
   PhoneNumber: string;
@@ -36,20 +34,20 @@ export default function Register(props: RegisterProps) {
   const [usePassword, setUsePassword] = useState(true);
 
   const onFieldsChange = (changedFields: any, allFields: any) => {
-    DEBUG && console.log('onFieldsChange:', changedFields, allFields);
+    console.log('onFieldsChange:', changedFields, allFields);
   };
 
   const onValuesChange = (changedValues: any, allValues: any) => {
-    DEBUG && console.log('onValuesChange:', changedValues, allValues);
+    console.log('onValuesChange:', changedValues, allValues);
   };
 
   const onFinish = (values: UserInfo) => {
-    DEBUG && console.log('onFinish:', values);
+    console.log('onFinish:', values);
     props.onConfirm(values);
   };
 
   const onFinishFailed = (errorInfo: any) => {
-    DEBUG && console.log('onFinishFailed:', errorInfo);
+    console.log('onFinishFailed:', errorInfo);
   };
 
   return (
@@ -57,7 +55,7 @@ export default function Register(props: RegisterProps) {
       <Title level={3}>用户注册</Title>
       <br />
       <Form
-        name="register"
+        name="Register"
         scrollToFirstError
         initialValues={{
           PhoneNumber: props.PhoneNumber,
@@ -148,7 +146,7 @@ export default function Register(props: RegisterProps) {
               </Checkbox>
             </Col>
           </Row>
-          {useID ? (
+          {useID && (
             <>
               <Row>
                 <Col span={labelCol} style={{ textAlign: 'right' }}>
@@ -165,10 +163,16 @@ export default function Register(props: RegisterProps) {
                         message: '请填写学号',
                         required: true,
                       },
-                      {
-                        message: '例: 2019123456',
-                        len: 10,
-                      },
+                      ({ setFieldsValue }) => ({
+                        validator(_, value) {
+                          if (value.length === 10) {
+                            // TODO 查找学院
+                            setFieldsValue({ School: '计算机学院' });
+                            return Promise.resolve();
+                          }
+                          return Promise.reject('例: 2019123456');
+                        },
+                      }),
                     ]}
                   >
                     <Input placeholder="请输入" type="number" />
@@ -186,7 +190,7 @@ export default function Register(props: RegisterProps) {
                 </Col>
               </Row>
             </>
-          ) : null}
+          )}
 
           <Row>
             <Col offset={checkoutOffset}>
@@ -201,7 +205,7 @@ export default function Register(props: RegisterProps) {
               </Checkbox>
             </Col>
           </Row>
-          {useName ? (
+          {useName && (
             <Row>
               <Col span={labelCol} style={{ textAlign: 'right' }}>
                 <span style={{ color: 'red' }}>*</span>
@@ -235,7 +239,7 @@ export default function Register(props: RegisterProps) {
                 </Form.Item>
               </Col>
             </Row>
-          ) : null}
+          )}
 
           <Row>
             <Col offset={checkoutOffset}>
@@ -250,7 +254,7 @@ export default function Register(props: RegisterProps) {
               </Checkbox>
             </Col>
           </Row>
-          {usePassword ? (
+          {usePassword && (
             <Row>
               <Col span={labelCol} style={{ textAlign: 'right' }}>
                 <span style={{ color: 'red' }}>*</span>
@@ -268,9 +272,7 @@ export default function Register(props: RegisterProps) {
                     },
                     {
                       validator: (_, value) =>
-                        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9]*$/.test(
-                          value,
-                        )
+                        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[\s\S]*$/.test(value)
                           ? Promise.resolve()
                           : Promise.reject('密码必须包含大小写字母和数字'),
                     },
@@ -286,7 +288,7 @@ export default function Register(props: RegisterProps) {
                 </Form.Item>
               </Col>
             </Row>
-          ) : null}
+          )}
 
           <Row>
             <Col offset={checkoutOffset}>
