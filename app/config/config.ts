@@ -6,6 +6,8 @@ export default defineConfig({
   define: {
     BUNDLE_FLAVOR: 'webapp',
   },
+  publicPath: process.env.PUBLIC_PATH || '/',
+  base: process.env.PUBLIC_PATH || '/',
   dynamicImport: {},
   exportStatic: {},
   fastRefresh: {},
