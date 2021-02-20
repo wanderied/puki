@@ -250,3 +250,5 @@ sketch
 # End of https://www.toptal.com/developers/gitignore/api/jetbrains+all,vscode,go,node,react
 
 dev.db
+
+storage/
