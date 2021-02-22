@@ -6,8 +6,28 @@ export default [
   },
   {
     exact: true,
+    path: '/account',
+    component: '@/pages/me/Account',
+  },
+  {
+    exact: true,
+    path: '/activity',
+    component: '@/pages/me/Activity',
+  },
+  {
+    exact: true,
     path: '/add',
     component: '@/pages/Add',
+  },
+  {
+    exact: true,
+    path: '/contact',
+    component: '@/pages/me/Contact',
+  },
+  {
+    exact: true,
+    path: '/identify',
+    component: '@/pages/me/Identify',
   },
   {
     exact: true,

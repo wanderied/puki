@@ -18,12 +18,12 @@ export default function Item(props: ItemProps) {
       className={style.myButton}
     >
       <Row justify="space-between">
-        <Col offset={1}>
-          <span>{props.label}</span>
+        <Col offset={1} style={{ display: 'flex', alignItems: 'center' }}>
+          {props.label}
         </Col>
         <Col>
-          <span style={{ height: '100%' }}>
-            {props.children}
+          {props.children}
+          {props.route && (
             <RightOutlined
               style={{
                 fontSize: '0.8em',
@@ -31,7 +31,7 @@ export default function Item(props: ItemProps) {
                 transform: 'translateX(0.5em)',
               }}
             />
-          </span>
+          )}
         </Col>
       </Row>
     </div>
