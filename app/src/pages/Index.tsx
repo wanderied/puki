@@ -14,6 +14,8 @@ export default function IndexPage() {
       <Link to="/test">test</Link>
       <Divider />
       <Link to="/topic">topic</Link>
+      <Divider />
+      <Link to="/team">team</Link>
     </div>
   );
 }
