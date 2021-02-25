@@ -52,7 +52,7 @@ export default [
   {
     exact: true,
     path: '/team',
-    component: '@/pages/team',
+    component: '@/pages/team/Index',
   },
   {
     exact: true,
