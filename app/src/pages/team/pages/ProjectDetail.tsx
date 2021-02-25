@@ -9,7 +9,9 @@ import {
   MessageOutlined,
   LikeFilled,
 } from '@ant-design/icons';
+
 import style from '../../../assets/team/css/expand.css';
+
 import { call } from '@/api-client';
 
 const { Title, Paragraph, Text } = Typography;
