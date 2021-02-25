@@ -18,22 +18,26 @@ interface contentProps {
 const data: contentProps = {
   contents: [
     {
-      imgSrc: 'http://n.sinaimg.cn/sinacn10116/600/w1920h1080/20190326/adec-hutwezf6832324.jpg',
+      imgSrc:
+        'http://n.sinaimg.cn/sinacn10116/600/w1920h1080/20190326/adec-hutwezf6832324.jpg',
       textMain: '缩略图',
       contentSrc: 'https://www.baidu.com',
     },
     {
-      imgSrc: 'http://n.sinaimg.cn/sinacn10116/600/w1920h1080/20190326/adec-hutwezf6832324.jpg',
+      imgSrc:
+        'http://n.sinaimg.cn/sinacn10116/600/w1920h1080/20190326/adec-hutwezf6832324.jpg',
       textMain: '活动描述',
       contentSrc: 'https://www.baidu.com',
     },
     {
-      imgSrc: 'http://n.sinaimg.cn/sinacn10116/600/w1920h1080/20190326/adec-hutwezf6832324.jpg',
+      imgSrc:
+        'http://n.sinaimg.cn/sinacn10116/600/w1920h1080/20190326/adec-hutwezf6832324.jpg',
       textMain: '活动描述',
       contentSrc: 'https://www.baidu.com',
     },
     {
-      imgSrc: 'http://n.sinaimg.cn/sinacn10116/600/w1920h1080/20190326/adec-hutwezf6832324.jpg',
+      imgSrc:
+        'http://n.sinaimg.cn/sinacn10116/600/w1920h1080/20190326/adec-hutwezf6832324.jpg',
       textMain: '活动描述',
       contentSrc: 'https://www.baidu.com',
     },
@@ -76,7 +80,7 @@ function SvgImg(props: content) {
 function Page(props: contentProps) {
   const [selected, setSelected] = useState(['topic']);
 
-  const onMenuClick = function({ key, keyPath }: { key: any; keyPath: any }) {
+  const onMenuClick = function ({ key, keyPath }: { key: any; keyPath: any }) {
     console.log(key);
     setSelected(keyPath);
   };
@@ -95,6 +99,6 @@ function Page(props: contentProps) {
   );
 }
 
-export default function() {
+export default function () {
   return <Page {...data} />;
 }
