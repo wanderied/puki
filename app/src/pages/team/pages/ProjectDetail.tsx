@@ -10,6 +10,7 @@ import {
   LikeFilled,
 } from '@ant-design/icons';
 import style from '../wwwroot/css/expand.css';
+import { call } from '@/api-client';
 
 const { Title, Paragraph, Text } = Typography;
 //来自ProjectCard的项目简略信息，这部分信息不需要再从数据库重新获取
@@ -23,16 +24,80 @@ interface ProjectDetailProps {
   };
 }
 
+interface GetProjectDetailReq {
+  ProjectID: number;
+}
+
+interface PositionSimple {
+  Name: string;
+  NowPeople: number;
+  NeedPeople: number;
+  InterestPeople: number;
+  Describe: string;
+}
+interface AwardSimple {
+  Name: string;
+}
+interface Comment {
+  CreatorName: string;
+  Content: string;
+}
+interface GetProjectDetailRes {
+  DescribeDetail: string;
+  LinkURL: string;
+  EndTime: string;
+  CreatorName: string;
+  CreatorSchool: string;
+  CreatorGrade: string;
+  CreatorAward: AwardSimple[];
+  Positions: PositionSimple[];
+  Comments: Comment[];
+}
+
 export default function ProjectDetail(props: ProjectDetailProps) {
-  const [ellipsis1, setEllipsis1] = React.useState(true);
-  const [ellipsis2, setEllipsis2] = React.useState(true);
+  const [ellipsis, setEllipsis1] = React.useState(true);
   const [likeNum, setLikeNum] = React.useState(0);
   const [isLike, setIsLike] = React.useState(false);
+  const [isFinished, setIsFinished] = React.useState(false);
   //基于ProjectDetailProps中的ProjectID，从数据库获取数据
-  //1. 发起人相关信息，包括姓名、头像、专业、年级、获奖情况
-  //2. 项目相关信息，包括项目图片、项目详细介绍
-  //3. 招募情况
-  //4. 评论条目
+  const [DescribeDetail, setDescribeDetail] = React.useState('');
+  const [LinkURL, setLinkURL] = React.useState('');
+  const [EndTime, setEndTime] = React.useState('');
+  const [CreatorName, setCreatorName] = React.useState('');
+  const [CreatorSchool, setCreatorSchool] = React.useState('');
+  const [CreatorGrade, setCreatorGrade] = React.useState('');
+  const [Awards, setAwards] = React.useState([{ Name: '' }]);
+  const [Comments, setComments] = React.useState([
+    { CreatorName: '', Content: '' },
+  ]);
+  const [Positions, setPositions] = React.useState([
+    {
+      Name: '',
+      NowPeople: 0,
+      NeedPeople: 0,
+      InterestPeople: 0,
+      Describe: '',
+    },
+  ]);
+
+  call<GetProjectDetailReq, GetProjectDetailRes>(
+    'ProjectService.GetProjectDetail',
+    { ProjectID: 1 },
+  ).then((r) => {
+    if (!isFinished) {
+      setDescribeDetail(r.DescribeDetail);
+      setLinkURL(r.LinkURL);
+      setEndTime(r.EndTime);
+      setCreatorName(r.CreatorName);
+      setCreatorSchool(r.CreatorSchool);
+      setCreatorGrade(r.CreatorGrade);
+      setAwards(r.CreatorAward);
+      setPositions(r.Positions);
+      setIsFinished(true);
+      setComments(r.Comments);
+    }
+  });
+
   return (
     <div style={{ marginLeft: '10px', marginRight: '10px', marginTop: '10px' }}>
       <Title level={3}>
@@ -61,7 +126,7 @@ export default function ProjectDetail(props: ProjectDetailProps) {
           <Paragraph
             style={{ fontSize: '16px' }}
             ellipsis={
-              ellipsis1 ? { rows: 4, expandable: true, symbol: '展开' } : false
+              ellipsis ? { rows: 4, expandable: true, symbol: '展开' } : false
             }
           >
             {props.location.state.ProjectDescribeSimple}
@@ -76,7 +141,7 @@ export default function ProjectDetail(props: ProjectDetailProps) {
               <Text>截止日期</Text>
             </div>
             <div>
-              <Text>2020-11-12</Text>
+              <Text>{EndTime}</Text>
             </div>
           </div>
         </Col>
@@ -178,95 +243,89 @@ export default function ProjectDetail(props: ProjectDetailProps) {
                 <Avatar style={{ marginTop: '5px' }} size={35}></Avatar>
               </Col>
               <Col flex={'auto'}>
-                <Title level={5}>姓名</Title>
-                <div style={{ marginTop: '-15px' }}>
-                  <Text>xxxxxxxx</Text>
+                <Title level={5}>{CreatorName}</Title>
+                <div style={{ marginTop: '-10px' }}>
+                  <Text>
+                    {CreatorSchool} {CreatorGrade}
+                  </Text>
                 </div>
               </Col>
             </Row>
           </Col>
           <Col flex={'40%'} style={{ marginTop: '10px' }}>
-            <div>ccc奖</div>
-            <div>ccc奖</div>
-            <div>ccc奖</div>
+            <Paragraph
+              style={{ fontSize: '16px', color: 'gray' }}
+              ellipsis={
+                ellipsis ? { rows: 2, expandable: true, symbol: '展开' } : false
+              }
+            >
+              {Awards.map((value) => (
+                <>
+                  {value.Name}
+                  <br />
+                </>
+              ))}
+            </Paragraph>
           </Col>
         </Row>
       </div>
       <div className={style.Box} style={{ marginTop: '-1px' }}>
         <div style={{ margin: '10px' }}>
           <div>招募</div>
-          <div style={{ marginTop: '10px' }}>
-            <Row wrap={false}>
-              <Col flex={'25%'}>
-                <Text>前端开发</Text>
-              </Col>
-              <Col flex={'42%'}>
-                <Progress percent={50} steps={3} showInfo={false} />
-              </Col>
-              <Col flex={'15%'}>录用：2</Col>
-              <Col flex={'3%'}> </Col>
-              <Col flex={'15%'}>投递：3</Col>
-            </Row>
-            <Paragraph
-              style={{ fontSize: '16px' }}
-              ellipsis={
-                ellipsis1
-                  ? { rows: 1, expandable: true, symbol: '展开' }
-                  : false
-              }
-            >
-              岗位需求:
-              xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            </Paragraph>
-          </div>
-          <div style={{ marginTop: '10px' }}>
-            <Row wrap={false}>
-              <Col flex={'25%'}>
-                <Text>后端开发</Text>
-              </Col>
-              <Col flex={'42%'}>
-                <Progress percent={25} steps={4} showInfo={false} />
-              </Col>
-              <Col flex={'15%'}>录用：1</Col>
-              <Col flex={'3%'}> </Col>
-              <Col flex={'15%'}>投递：4</Col>
-            </Row>
-            <Paragraph
-              style={{ fontSize: '16px' }}
-              ellipsis={
-                ellipsis1
-                  ? { rows: 1, expandable: true, symbol: '展开' }
-                  : false
-              }
-            >
-              岗位需求:
-              xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-            </Paragraph>
-          </div>
+          {Positions.map((value) => (
+            <div style={{ marginTop: '10px' }}>
+              <Row wrap={false}>
+                <Col flex={'25%'}>
+                  <Text strong>{value.Name}</Text>
+                </Col>
+                <Col flex={'42%'}>
+                  <Progress
+                    percent={(value.NowPeople / value.NeedPeople) * 100}
+                    steps={value.NeedPeople}
+                    showInfo={false}
+                  />
+                </Col>
+                <Col flex={'15%'}>录用：{value.NowPeople}</Col>
+                <Col flex={'3%'}> </Col>
+                <Col flex={'15%'}>投递：{value.InterestPeople}</Col>
+              </Row>
+              <Paragraph
+                style={{ fontSize: '16px', color: 'gray' }}
+                ellipsis={
+                  ellipsis
+                    ? { rows: 1, expandable: true, symbol: '展开' }
+                    : false
+                }
+              >
+                岗位需求: {value.Describe}
+              </Paragraph>
+            </div>
+          ))}
         </div>
       </div>
       <div id="detail" className={style.Box} style={{ marginTop: '-1px' }}>
         <div style={{ margin: '10px' }}>
           <div>详情</div>
-          <div>
-            adsdasdo joaisdasodj sahdsuoadh aisudhsad isjnd saiudh jsasknd
-            biisahd saoudhsiu
-          </div>
+          <div>{DescribeDetail}</div>
         </div>
       </div>
       <div id="comment" className={style.Box} style={{ marginTop: '-1px' }}>
         <div style={{ margin: '10px' }}>
           <div>评论</div>
           <div>
-            <Row>
-              <Col flex={'35px'}>
-                <Avatar style={{ margin: '10px' }} size={35}></Avatar>
-              </Col>
-              <Col flex={'auto'}>
-                <Title level={5}>xxx</Title>
-                <div style={{ marginTop: '-10px' }}>asdsadadwds sdasd</div>
-              </Col>
-            </Row>
+            {Comments.map((value) => (
+              <Row>
+                <Col flex={'35px'}>
+                  <Avatar style={{ margin: '10px' }} size={35}>
+                    {' '}
+                  </Avatar>
+                </Col>
+                <Col flex={'auto'}>
+                  <Title level={5}>{value.CreatorName}</Title>
+                  <div style={{ marginTop: '-10px' }}>{value.Content}</div>
+                </Col>
+              </Row>
+            ))}
           </div>
         </div>
       </div>
