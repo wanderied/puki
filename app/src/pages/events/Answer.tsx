@@ -36,7 +36,7 @@ export default function Answer(props: Answerprops) {
                 <view className="txt">
                     <Col className="content">
 
-                        看一下流程卡在哪个环节。正常流程是： 项目负责人提交-->导师确认-->学院基地主任确认-->校级管理确认。
+                        看一下流程卡在哪个环节。正常流程是： 项目负责人提交--{'>'}导师确认--{'>'}学院基地主任确认--{'>'}校级管理确认。
 
                     </Col>
                     <text className="personTxt">
