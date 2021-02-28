@@ -14,6 +14,10 @@ export default function IndexPage() {
       <Link to="/test">test</Link>
       <Divider />
       <Link to="/topic">topic</Link>
+      <Divider />
+      <Link to="/QingNianDaXueXi">QianNianDaXueXi</Link>
+      <Divider />
+      <Link to="/SanHuiLiangZhi">SanHuiLiangZhi</Link>
     </div>
   );
 }

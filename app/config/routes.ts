@@ -54,4 +54,14 @@ export default [
     path: '/topic',
     component: '@/pages/bbs/Index',
   },
+  {
+    exact: true,
+    path: '/QingNianDaXueXi',
+    component: '@/pages/QianQing/QingNianDaXueXi',
+  },
+  {
+    exact: true,
+    path: '/SanHuiLiangZhi',
+    component: '@/pages/QianQing/SanHuiLiangZhi',
+  },
 ];
