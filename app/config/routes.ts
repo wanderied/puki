@@ -7,12 +7,32 @@ export default [
   {
     exact: true,
     path: '/auth/phone-login',
-    component: '@/pages/auth/phone-login',
+    component: '@/pages/auth/phone-login/Index',
   },
   {
     exact: true,
     path: '/auth/register',
-    component: '@/pages/auth/register',
+    component: '@/pages/auth/Register',
+  },
+  {
+    exact: true,
+    path: '/events',
+    component: '@/pages/events/Index',
+  },
+  {
+    exact: true,
+    path: '/events/entered-for',
+    component: '@/pages/events/EnteredFor',
+  },
+  {
+    exact: true,
+    path: '/events/more-info',
+    component: '@/pages/events/MoreInfo',
+  },
+  {
+    exact: true,
+    path: '/events/questions',
+    component: '@/pages/events/Questions',
   },
   {
     exact: true,
@@ -26,8 +46,8 @@ export default [
   },
   {
     exact: true,
-    path: '/me/activity',
-    component: '@/pages/me/Activity',
+    path: '/me/events',
+    component: '@/pages/me/Events',
   },
   {
     exact: true,
