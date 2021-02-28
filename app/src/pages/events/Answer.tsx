@@ -1,3 +1,4 @@
+import React, { Component } from 'react';
 import { Typography } from 'antd';
 import { history } from 'umi';
 import { Row, Col, Space } from 'antd';
@@ -10,13 +11,23 @@ import './Question.tsx';
 
 export interface Answerprops {
   title: string;
-  answer: string;
+  content: string;
   date: string;
   answerer: string;
   id: string;
 }
 
-export default function Answer(props: Answerprops) {
+const data: Answerprops = {
+  title: '求2020-2021雏燕计划时间安排',
+  content:
+    "看一下流程卡在哪个环节。正常流程是： 项目负责人提交-->导师确认-->学院基地主任确认-->校级管理确认。",
+  date: '2020-2-16',
+  answerer: 'XXX',
+  id: '10',
+};
+
+export default function Answerprops(props: Answerprops) {
+  props = data;
   return (
     <div>
       <div className="body">
@@ -34,15 +45,11 @@ export default function Answer(props: Answerprops) {
 
         <div className="questionBox">
           <div className="time">
-            <span className="timeTxt">2020-2-16</span>
+            <span className="timeTxt">{props.date}</span>
           </div>
           <div className="txt">
-            <Col className="content">
-              看一下流程卡在哪个环节。正常流程是： 项目负责人提交--{'>'}
-              导师确认--
-              {'>'}学院基地主任确认--{'>'}校级管理确认。
-            </Col>
-            <span className="personTxt">回答者：XXX</span>
+            <Col className="content">{props.content}</Col>
+            <span className="personTxt">回答者：{props.answerer}</span>
           </div>
         </div>
       </div>
