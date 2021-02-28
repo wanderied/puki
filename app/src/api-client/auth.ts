@@ -19,7 +19,7 @@ export interface SMSCodeLoginRes {
   User: { RealName: string };
 }
 
-export interface WhoAmIRes {
+export interface GetProfileRes {
   User: { PhoneNumber: string; RealName: string };
 }
 
@@ -38,7 +38,7 @@ export interface RegisterRes {
   Registered: boolean;
 }
 
-export const auth = {
+export default {
   UserService: {
     SMSSendCode: 'auth/UserService.SMSSendCode' as Endpoint<
       SMSSendCodeReq,
@@ -48,7 +48,7 @@ export const auth = {
       SMSCodeLoginReq,
       SMSCodeLoginRes
     >,
-    WhoAmI: 'auth/UserService.WhoAmI' as Endpoint<{}, WhoAmIRes>,
+    GetProfile: 'auth/UserService.GetProfile' as Endpoint<{}, GetProfileRes>,
     Register: 'auth/UserService.Register' as Endpoint<RegisterReq, RegisterRes>,
   },
 };

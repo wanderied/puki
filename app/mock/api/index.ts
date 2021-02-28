@@ -1,33 +1,37 @@
 import auth from './auth/index';
+import events from './events/index';
+
+const serve = {
+  auth,
+  events,
+};
 
 export default {
   'POST /api/': (req: any, res: any) => {
     const { method, params } = req.body;
-    console.log('method: ', method);
-    console.log('params: ', params);
 
-    //@ts-ignore
-    const [, Module, Service, Method]: string[] = /^(\w+)\/(\w+)\.(\w+)$/.exec(
+    const [, Module, Service, Method] = /^(\w+)\/(\w+)\.(\w+)$/.exec(
       method,
-    );
+    ) as string[];
 
-    let reply = {
+    let result = {
       err: {
         message: 'mock service unfind',
         status: 3,
       },
     };
-    switch (Module) {
-      case 'auth':
-        try {
-          //@ts-ignore
-          reply = auth[Service][Method](params);
-        } catch (err) {
-          console.log(err);
-        }
-        break;
+    try {
+      //@ts-ignore
+      result = serve[Module][Service][Method](params);
+    } catch (err) {
+      console.log(err);
     }
+    res.send({ result }).end();
 
-    res.send(reply).end();
+    console.log('Module: ', Module);
+    console.log('Service: ', Service);
+    console.log('Method: ', Method);
+    console.log('params: ', params);
+    console.log('result: ', result);
   },
 };

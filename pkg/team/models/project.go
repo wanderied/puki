@@ -27,7 +27,7 @@ type Project struct {
 
 	//项目介绍：
 	//项目名称; 要求：不允许出现两个项目名称相同
-	Name string
+	Name string `gorm:"unique"`
 	//简短的文字介绍，用3~5句话讲清是做什么，用于首屏中卡片中简单介绍项目，以及详情页中的”简介“
 	DescribeSimple string
 	//详细的文字介绍，详细介绍项目是做什么，包括项目背景、目标、成果等等信息，用于详情页中的详细介绍项目
