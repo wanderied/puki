@@ -1,4 +1,4 @@
-import LANTU from '@/assets/LANTU.png';
+import lantu from '@/assets/lantu.png';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Col, Image, Input, Row, Space, Switch } from 'antd';
 import { Link } from 'umi';
@@ -7,7 +7,7 @@ import style from '@/pages/home/Login.less';
 export default function Login() {
   return (
     <div className={style.login}>
-      <Image preview={false} src={LANTU}></Image>
+      <Image preview={false} src={lantu}></Image>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         <Input
           className={style.input}

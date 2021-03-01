@@ -58,6 +58,50 @@ export default function Community() {
       <div>XXXXXXX</div>
       <div>XXXXXXX</div>
       <div>XXXXXXX</div>
+
+      {/* <div>
+      <div>
+        <div>欢迎使用</div> 
+        <div>蓝图开放平台</div>
+        <Button>注册/登录</Button>
+        <Button>了解更多</Button>
+      </div>
+    </div> */}
+      <Row>
+        <Col>
+          {' '}
+          <Link to="/">产品</Link>
+        </Col>
+        <Col>
+          {' '}
+          <Link to="/">企业介绍</Link>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          {' '}
+          <Link to="/">产品介绍</Link>
+        </Col>
+        <Col>
+          {' '}
+          <Link to="/">关于我们</Link>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          {' '}
+          <Link to="/">产品服务</Link>
+        </Col>
+        <Col>
+          {' '}
+          <Link to="/">社区</Link>
+        </Col>
+      </Row>
+
+      <div>蓝图开放平台</div>
+      <div>来自：北京邮电大学计算机学院</div>
+      <div>电话：xxx</div>
+      <div>邮箱：XXX@xx.com</div>
     </div>
   );
 }
