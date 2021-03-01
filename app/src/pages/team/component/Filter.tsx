@@ -1,13 +1,25 @@
 import { call, team } from '@/api-client';
-import { Col, Row, Select } from 'antd';
-import React from 'react';
-import { useAsync } from 'react-use';
-
+import { ProjectSimple } from '@/api-client/team';
+import logo from '@/assets/team/img/logo.png';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import { Col, Input, Row, Select, Space, Typography } from 'antd';
+import _ from 'lodash';
+import { lazy, useState } from 'react';
+import { useAsync, useSetState } from 'react-use';
+import { Link } from 'umi';
+const { Search } = Input;
 interface FilterProps {
-  onChangeFilter: (filter: (v: any) => boolean) => void;
+  onChangeFilter: (filter: (v: ProjectSimple) => boolean) => void;
 }
 
 export default function Filter(props: FilterProps) {
+  const [state, setState] = useSetState({
+    searchValue: '',
+    competitionName: 'all',
+    competitionType: 'all',
+    positionName: 'all',
+  });
+
   const typeListState = useAsync(async () => {
     return {
       competitionNames: (
@@ -23,37 +35,104 @@ export default function Filter(props: FilterProps) {
 
   const {
     value: { competitionNames, competitionTypes, positionNames } = {
-      competitionNames: [''],
-      competitionTypes: [''],
-      positionNames: [''],
+      competitionNames: [],
+      competitionTypes: [],
+      positionNames: [],
     },
   } = typeListState;
 
-  function onCompetitionNameChange(value: string) {
-    console.log(value);
-  }
-  function onCompetitionTypeChange(value: string) {
-    console.log(value);
-  }
-  function onPositionNameChange(value: string) {
-    console.log(value);
-  }
+  const handler = (fields: typeof state) => {
+    setState(fields);
+
+    const {
+      searchValue,
+      competitionName,
+      competitionType,
+      positionName,
+    } = fields;
+
+    props.onChangeFilter((projectSimple: ProjectSimple) => {
+      const searchMatch =
+        projectSimple.ProjectName.search(searchValue) >= 0 ||
+        projectSimple.ProjectDescription.search(searchValue) >= 0;
+      const nameMatch =
+        competitionName === 'all' ||
+        _.indexOf(projectSimple.CompetitionNames, competitionName) >= 0;
+      const typeMatch =
+        competitionType === 'all' || projectSimple.TypeName === competitionType;
+      const positionMatch =
+        positionName === 'all' ||
+        _.indexOf(projectSimple.PositionNames, positionName) >= 0;
+      console.log(
+        projectSimple.ProjectID,
+        searchMatch,
+        competitionName,
+        competitionType,
+        positionName,
+      );
+      return searchMatch && nameMatch && positionMatch && typeMatch;
+    });
+  };
+
+  const onSearchChange = (searchValue: string) => {
+    const fields = { ...state, searchValue };
+    handler(fields);
+  };
+
+  const onCompetitionNameChange = (competitionName: string) => {
+    const fields = { ...state, competitionName };
+    handler(fields);
+  };
+
+  const onCompetitionTypeChange = (competitionType: string) => {
+    const fields = { ...state, competitionType };
+    handler(fields);
+  };
+
+  const onPositionChange = (positionName: string) => {
+    const fields = { ...state, positionName };
+    handler(fields);
+  };
 
   return (
     <div>
+      <Row align="middle">
+        <Col flex="50px">
+          <Link to="team">
+            <img alt={logo} width="50" src={logo} />
+          </Link>
+        </Col>
+        <Col flex="auto">
+          <div style={{ width: '100%', textAlign: 'center' }}>
+            <Space direction="vertical" style={{ width: '98%' }}>
+              <Search
+                placeholder="请输入关键词查询"
+                onSearch={onSearchChange}
+                size="large"
+                style={{ width: '100%' }}
+              />
+            </Space>
+          </div>
+        </Col>
+        <Col flex="30px" style={{ textAlign: 'right' }}>
+          <PlusCircleOutlined style={{ fontSize: 30, color: 'black' }} />
+        </Col>
+      </Row>
       <Row justify="space-around" style={{ marginTop: '7px' }} wrap={false}>
         {/*按比赛/活动筛选*/}
         <Col span={7}>
           <Select
             style={{ width: '100%' }}
             dropdownMatchSelectWidth={false}
-            defaultValue={'所有比赛/活动'}
             loading={typeListState.loading}
             onChange={onCompetitionNameChange}
-            options={competitionNames.map((v) => ({
-              label: v,
-              value: v,
-            }))}
+            options={[
+              { label: '全部比赛/活动', value: 'all' },
+              ...competitionNames.map((v) => ({
+                label: v,
+                value: v,
+              })),
+            ]}
             placeholder="按比赛"
           />
         </Col>
@@ -62,13 +141,15 @@ export default function Filter(props: FilterProps) {
           <Select
             style={{ width: '100%' }}
             dropdownMatchSelectWidth={false}
-            defaultValue={'所有类别'}
             loading={typeListState.loading}
             onChange={onCompetitionTypeChange}
-            options={competitionTypes.map((v) => ({
-              label: v,
-              value: v,
-            }))}
+            options={[
+              { label: '全部类别', value: 'all' },
+              ...competitionTypes.map((v) => ({
+                label: v,
+                value: v,
+              })),
+            ]}
             placeholder="按类别"
           />
         </Col>
@@ -77,13 +158,15 @@ export default function Filter(props: FilterProps) {
           <Select
             style={{ width: '100%' }}
             dropdownMatchSelectWidth={false}
-            defaultValue={'所有岗位'}
             loading={typeListState.loading}
-            onChange={onPositionNameChange}
-            options={positionNames.map((v) => ({
-              label: v,
-              value: v,
-            }))}
+            onChange={onPositionChange}
+            options={[
+              { label: '全部岗位', value: 'all' },
+              ...positionNames.map((v) => ({
+                label: v,
+                value: v,
+              })),
+            ]}
             placeholder="按岗位"
           />
         </Col>
