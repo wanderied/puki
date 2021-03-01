@@ -1,7 +1,7 @@
 import { MoreOutlined } from '@ant-design/icons';
-import { Col, Row, Space, Button, Card, Tag, Typography } from 'antd';
+import { Button, Card, Col, Row, Space, Tag, Typography } from 'antd';
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
 interface CardProps {
   ProjectName: string;

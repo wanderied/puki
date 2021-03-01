@@ -2,9 +2,8 @@ import { call, team } from '@/api-client';
 import { ProjectSimple } from '@/api-client/team';
 import logo from '@/assets/team/img/logo.png';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { Col, Input, Row, Select, Space, Typography } from 'antd';
+import { Col, Input, Row, Select, Space } from 'antd';
 import _ from 'lodash';
-import { lazy, useState } from 'react';
 import { useAsync, useSetState } from 'react-use';
 import { Link } from 'umi';
 const { Search } = Input;
@@ -52,17 +51,22 @@ export default function Filter(props: FilterProps) {
     } = fields;
 
     props.onChangeFilter((projectSimple: ProjectSimple) => {
+      const reg = new RegExp(searchValue.replace('\\', '\\\\'), 'gi');
       const searchMatch =
-        projectSimple.ProjectName.search(searchValue) >= 0 ||
-        projectSimple.ProjectDescription.search(searchValue) >= 0;
+        reg.test(projectSimple.ProjectName) ||
+        reg.test(projectSimple.ProjectDescription);
+
       const nameMatch =
         competitionName === 'all' ||
         _.indexOf(projectSimple.CompetitionNames, competitionName) >= 0;
+
       const typeMatch =
         competitionType === 'all' || projectSimple.TypeName === competitionType;
+
       const positionMatch =
         positionName === 'all' ||
         _.indexOf(projectSimple.PositionNames, positionName) >= 0;
+
       console.log(
         projectSimple.ProjectID,
         searchMatch,
@@ -70,6 +74,7 @@ export default function Filter(props: FilterProps) {
         competitionType,
         positionName,
       );
+
       return searchMatch && nameMatch && positionMatch && typeMatch;
     });
   };

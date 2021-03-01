@@ -1,7 +1,7 @@
 import { call, team } from '@/api-client';
 import { ProjectSimple } from '@/api-client/team';
 import { Drawer, List } from 'antd';
-import { useAsync, useAsyncFn, useSetState } from 'react-use';
+import { useAsync, useSetState } from 'react-use';
 import Filter from './component/Filter';
 import ProjectCard from './component/ProjectCard';
 import ProjectDetail from './component/ProjectDetail';
